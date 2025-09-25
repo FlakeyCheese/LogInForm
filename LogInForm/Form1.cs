@@ -8,7 +8,7 @@ namespace LogInForm
 {
     public partial class Form1 : Form
     {
-        private const string DatabasePath = "C:\\Users\\771666\\OneDrive - wqeic.ac.uk\\users.db";
+        private const string DatabasePath = "users.db";
         // Database file path - this is where LiteDB stores all data persistently
 
         public Form1()
@@ -16,8 +16,7 @@ namespace LogInForm
             InitializeComponent();
             // Initialize the database when the form loads
             InitializeDatabase();
-            // Update the UI to show current database status
-            UpdateDatabaseInfo();
+            
         }
         /// <summary>
         /// Initializes the database and creates sample data if needed
@@ -47,22 +46,7 @@ namespace LogInForm
         /// Updates the UI to show current database file information
         /// Demonstrates that data is stored persistently in a file
         /// </summary>
-        private void UpdateDatabaseInfo()
-        {
-            // Check if the database file exists on disc
-            if (File.Exists(DatabasePath))
-            {
-                // Get information about the physical database file
-                var fileInfo = new FileInfo(DatabasePath);
-
-                // Display file path and size to prove data is stored persistently
-                lblStatus.Text = $"Database: {DatabasePath} ({fileInfo.Length} bytes)";
-            }
-            else
-            {
-                lblStatus.Text = "Database: Not found";
-            }
-        }
+       
         /// <summary>
         /// Handles the login button click event
         /// Validates user credentials against the database
@@ -76,14 +60,16 @@ namespace LogInForm
             if (ValidateUser(username, password))
             {
                 MessageBox.Show("Login successful! Data persists between sessions.");
+                txtPassword.Text = "";
+                txtUsername.Text = "";//clear the fields when done
+
                 // In a real app, you would open the main application form here
             }
             else
             {
                 MessageBox.Show("Invalid credentials.");
             }
-            // Refresh the database info display
-            UpdateDatabaseInfo();
+            
         }
         /// <summary>
         /// Validates user credentials by querying the database
@@ -109,22 +95,24 @@ namespace LogInForm
         /// </summary>
         private void btnRegister_Click(object sender, EventArgs e)
         {
-            // Get user input from textboxes
+            // Get user input from textboxes. In production THESE SHOULD BE VALIDATED
+            //null checked and rule checked
             string username = txtUsername.Text;
             string password = txtPassword.Text;
 
             // Attempt to register the new user
             if (RegisterUser(username, password))
             {
-                MessageBox.Show("Registration successful! This user will persist after app closes.");
+                MessageBox.Show("Registration successful! ");
+                txtPassword.Text = "";
+                txtUsername.Text = "";//clear the fields when done
             }
             else
             {
                 MessageBox.Show("Registration failed. Username may already exist.");
             }
 
-            // Refresh the database info display
-            UpdateDatabaseInfo();
+            
         }
         /// <summary>
         /// Registers a new user by inserting into the database
