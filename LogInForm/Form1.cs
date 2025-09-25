@@ -39,7 +39,12 @@ namespace LogInForm
                 {
                     // Insert a default admin user for first-time use
                     // Note: In production, always hash passwords - this is just for demo
-                    users.Insert(new User { Username = "admin", Password = "password" });
+                    using (Aes myAes = Aes.Create())
+                    { //create a new AES object to generate a key and IV for encryption
+                        byte[] password = EncryptStringToBytes_Aes("password", myAes.Key, myAes.IV);
+
+                        users.Insert(new User { Username = "admin", Password = password });
+                    }
                 }
             }
         }
@@ -83,7 +88,11 @@ namespace LogInForm
 
                 // Query the database: check if a user exists with matching username AND password
                 // The Exists() method returns true if any document matches the condition
-                return users.Exists(u => u.Username == username && u.Password == password);
+                using (Aes myAes = Aes.Create())
+                { //create a new AES object to generate a key and IV for encryption
+                    byte[] hashPassword = EncryptStringToBytes_Aes(password, myAes.Key, myAes.IV);
+                    return users.Exists(u => u.Username == username && u.Password == hashPassword);
+                }
             }
             // Connection automatically closes here
         }
