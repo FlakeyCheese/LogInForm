@@ -8,7 +8,7 @@ namespace LogInForm
 {
     public partial class Form1 : Form
     {
-        private const string DatabasePath = "C:\\Users\\771666\\OneDrive - wqeic.ac.uk\\users.db";
+        private const string DatabasePath = "users.db";
         // Database file path - this is where LiteDB stores all data persistently
 
         public Form1()
