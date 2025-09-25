@@ -2,6 +2,7 @@ using LiteDB;
 using Microsoft.VisualBasic;
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 
 namespace LogInForm
@@ -42,10 +43,7 @@ namespace LogInForm
                 }
             }
         }
-        /// <summary>
-        /// Updates the UI to show current database file information
-        /// Demonstrates that data is stored persistently in a file
-        /// </summary>
+       
        
         /// <summary>
         /// Handles the login button click event
@@ -98,27 +96,30 @@ namespace LogInForm
             // Get user input from textboxes. In production THESE SHOULD BE VALIDATED
             //null checked and rule checked
             string username = txtUsername.Text;
-            string password = txtPassword.Text;
+            string tempPassword = txtPassword.Text;
+            using (Aes myAes = Aes.Create())
+            { //create a new AES object to generate a key and IV for encryption
+                byte[] password = EncryptStringToBytes_Aes(tempPassword, myAes.Key, myAes.IV);
 
-            // Attempt to register the new user
-            if (RegisterUser(username, password))
-            {
-                MessageBox.Show("Registration successful! ");
-                txtPassword.Text = "";
-                txtUsername.Text = "";//clear the fields when done
+                // Attempt to register the new user
+                if (RegisterUser(username, password))
+                {
+                    MessageBox.Show("Registration successful! ");
+                    txtPassword.Text = "";
+                    txtUsername.Text = "";//clear the fields when done
+                }
+                else
+                {
+                    MessageBox.Show("Registration failed. Username may already exist.");
+                }
             }
-            else
-            {
-                MessageBox.Show("Registration failed. Username may already exist.");
-            }
-
             
         }
         /// <summary>
         /// Registers a new user by inserting into the database
         /// Returns true if registration was successful
         /// </summary>
-        private bool RegisterUser(string username, string password)
+        private bool RegisterUser(string username, byte[] password)
         {
             try
             {
@@ -145,30 +146,49 @@ namespace LogInForm
             }
         }
         /// <summary>
-        /// Demonstrates database persistence by showing all stored users
-        /// This proves data survives application restarts
+        /// https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.aes?view=net-9.0
         /// </summary>
-        private void btnShowUsers_Click(object sender, EventArgs e)
+        /// encrytion routin from MS
+        
+        static byte[] EncryptStringToBytes_Aes(string plainText, byte[] Key, byte[] IV)
         {
-            // Open database connection
-            using (var db = new LiteDatabase(DatabasePath))
+            // Check arguments.
+            if (plainText == null || plainText.Length <= 0)
+                throw new ArgumentNullException("plainText");
+            if (Key == null || Key.Length <= 0)
+                throw new ArgumentNullException("Key");
+            if (IV == null || IV.Length <= 0)
+                throw new ArgumentNullException("IV");
+            byte[] encrypted;
+
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
             {
-                // Get all users from the collection
-                var users = db.GetCollection<User>("users");
+                aesAlg.Key = Key;
+                aesAlg.IV = IV;
 
-                // Retrieve all documents from the users collection
-                var allUsers = users.FindAll();
+                // Create an encryptor to perform the stream transform.
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
-                // Build a string showing all current users
-                string userList = "Current users in database:\n";
-                foreach (var user in allUsers)
+                // Create the streams used for encryption.
+                using (MemoryStream msEncrypt = new MemoryStream())
                 {
-                    userList += $"- {user.Username}\n";
-                }
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            //Write all data to the stream.
+                            swEncrypt.Write(plainText);
+                        }
+                    }
 
-                // Display the list to prove data is persistently stored
-                MessageBox.Show(userList);
+                    encrypted = msEncrypt.ToArray();
+                }
             }
+
+            // Return the encrypted bytes from the memory stream.
+            return encrypted;
         }
 
     }
@@ -186,6 +206,6 @@ namespace LogInForm
         public string Username { get; set; }
 
         // Password for login (in production, this should be hashed)
-        public string Password { get; set; }
+        public byte[] Password { get; set; }//set to byte array for encryption.
     }
 }
