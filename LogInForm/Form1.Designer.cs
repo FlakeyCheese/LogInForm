@@ -27,7 +27,6 @@
         private Button btnRegister;
         private Label label1;
         private Label label2;
-        private Label lblStatus;
         private Button btnShowUsers;
 
         private void InitializeComponent()
@@ -38,7 +37,6 @@
             btnRegister = new Button();
             label1 = new Label();
             label2 = new Label();
-            lblStatus = new Label();
             btnShowUsers = new Button();
             SuspendLayout();
             // 
@@ -95,30 +93,16 @@
             label2.TabIndex = 5;
             label2.Text = "Password:";
             // 
-            // lblStatus
-            // 
-            lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(12, 152);
-            lblStatus.Name = "lblStatus";
-            lblStatus.Size = new Size(82, 15);
-            lblStatus.TabIndex = 6;
-            lblStatus.Text = "Database Info:";
-            // 
             // btnShowUsers
             // 
-            btnShowUsers.Location = new Point(100, 110);
+            btnShowUsers.Location = new Point(0, 0);
             btnShowUsers.Name = "btnShowUsers";
-            btnShowUsers.Size = new Size(150, 25);
-            btnShowUsers.TabIndex = 7;
-            btnShowUsers.Text = "Show All Users";
-            btnShowUsers.UseVisualStyleBackColor = true;
-            btnShowUsers.Click += btnShowUsers_Click;
+            btnShowUsers.Size = new Size(75, 23);
+            btnShowUsers.TabIndex = 0;
             // 
             // Form1
             // 
-            ClientSize = new Size(477, 290);
-            Controls.Add(btnShowUsers);
-            Controls.Add(lblStatus);
+            ClientSize = new Size(330, 182);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(btnRegister);
@@ -130,7 +114,7 @@
             MinimizeBox = false;
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Login (Data Persists)";
+            Text = "Login ";
             ResumeLayout(false);
             PerformLayout();
         }

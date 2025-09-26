@@ -16,8 +16,7 @@ namespace LogInForm
             InitializeComponent();
             // Initialize the database when the form loads
             InitializeDatabase();
-            // Update the UI to show current database status
-            UpdateDatabaseInfo();
+            
         }
         /// <summary>
         /// Initializes the database and creates sample data if needed
@@ -43,26 +42,7 @@ namespace LogInForm
                 }
             }
         }
-        /// <summary>
-        /// Updates the UI to show current database file information
-        /// Demonstrates that data is stored persistently in a file
-        /// </summary>
-        private void UpdateDatabaseInfo()
-        {
-            // Check if the database file exists on disc
-            if (File.Exists(DatabasePath))
-            {
-                // Get information about the physical database file
-                var fileInfo = new FileInfo(DatabasePath);
-
-                // Display file path and size to prove data is stored persistently
-                lblStatus.Text = $"Database: {DatabasePath} ({fileInfo.Length} bytes)";
-            }
-            else
-            {
-                lblStatus.Text = "Database: Not found";
-            }
-        }
+       
         /// <summary>
         /// Handles the login button click event
         /// Validates user credentials against the database
@@ -75,15 +55,14 @@ namespace LogInForm
             // Validate credentials against the database
             if (ValidateUser(username, password))
             {
-                MessageBox.Show("Login successful! Data persists between sessions.");
+                MessageBox.Show("Login successful! ");
                 // In a real app, you would open the main application form here
             }
             else
             {
                 MessageBox.Show("Invalid credentials.");
             }
-            // Refresh the database info display
-            UpdateDatabaseInfo();
+           
         }
         /// <summary>
         /// Validates user credentials by querying the database
@@ -99,6 +78,7 @@ namespace LogInForm
 
                 // Query the database: check if a user exists with matching username AND password
                 // The Exists() method returns true if any document matches the condition
+                // u=> is a Lambda expression where u represents each user in the collection
                 return users.Exists(u => u.Username == username && u.Password == password);
             }
             // Connection automatically closes here
@@ -116,15 +96,14 @@ namespace LogInForm
             // Attempt to register the new user
             if (RegisterUser(username, password))
             {
-                MessageBox.Show("Registration successful! This user will persist after app closes.");
+                MessageBox.Show("Registration successful! ");
             }
             else
             {
                 MessageBox.Show("Registration failed. Username may already exist.");
             }
 
-            // Refresh the database info display
-            UpdateDatabaseInfo();
+           
         }
         /// <summary>
         /// Registers a new user by inserting into the database
@@ -160,28 +139,7 @@ namespace LogInForm
         /// Demonstrates database persistence by showing all stored users
         /// This proves data survives application restarts
         /// </summary>
-        private void btnShowUsers_Click(object sender, EventArgs e)
-        {
-            // Open database connection
-            using (var db = new LiteDatabase(DatabasePath))
-            {
-                // Get all users from the collection
-                var users = db.GetCollection<User>("users");
-
-                // Retrieve all documents from the users collection
-                var allUsers = users.FindAll();
-
-                // Build a string showing all current users
-                string userList = "Current users in database:\n";
-                foreach (var user in allUsers)
-                {
-                    userList += $"- {user.Username}\n";
-                }
-
-                // Display the list to prove data is persistently stored
-                MessageBox.Show(userList);
-            }
-        }
+     
 
     }
     /// <summary>
