@@ -79,6 +79,7 @@ namespace LogInForm
                 // Query the database: check if a user exists with matching username AND password
                 // The Exists() method returns true if any document matches the condition
                 // u=> is a Lambda expression where u represents each user in the collection
+                // Lambda expression allow me to write a method without a name to carry out a simple task
                 return users.Exists(u => u.Username == username && u.Password == password);
             }
             // Connection automatically closes here
